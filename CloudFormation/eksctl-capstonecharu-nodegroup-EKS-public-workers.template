@@ -1,0 +1,311 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "EKS nodes (AMI family: AmazonLinux2, SSH access: false, private networking: false) [created and managed by eksctl]",
+  "Mappings": {
+    "ServicePrincipalPartitionMap": {
+      "aws": {
+        "EC2": "ec2.amazonaws.com",
+        "EKS": "eks.amazonaws.com",
+        "EKSFargatePods": "eks-fargate-pods.amazonaws.com"
+      },
+      "aws-cn": {
+        "EC2": "ec2.amazonaws.com.cn",
+        "EKS": "eks.amazonaws.com",
+        "EKSFargatePods": "eks-fargate-pods.amazonaws.com"
+      },
+      "aws-us-gov": {
+        "EC2": "ec2.amazonaws.com",
+        "EKS": "eks.amazonaws.com",
+        "EKSFargatePods": "eks-fargate-pods.amazonaws.com"
+      }
+    }
+  },
+  "Resources": {
+    "EgressInterCluster": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "Description": "Allow control plane to communicate with worker nodes in group EKS-public-workers (kubelet and workload TCP ports)",
+        "DestinationSecurityGroupId": {
+          "Ref": "SG"
+        },
+        "FromPort": 1025,
+        "GroupId": {
+          "Fn::ImportValue": "eksctl-capstonecharu-cluster::SecurityGroup"
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 65535
+      }
+    },
+    "EgressInterClusterAPI": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "Description": "Allow control plane to communicate with worker nodes in group EKS-public-workers (workloads using HTTPS port, commonly used with extension API servers)",
+        "DestinationSecurityGroupId": {
+          "Ref": "SG"
+        },
+        "FromPort": 443,
+        "GroupId": {
+          "Fn::ImportValue": "eksctl-capstonecharu-cluster::SecurityGroup"
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 443
+      }
+    },
+    "IngressInterCluster": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "Description": "Allow worker nodes in group EKS-public-workers to communicate with control plane (kubelet and workload TCP ports)",
+        "FromPort": 1025,
+        "GroupId": {
+          "Ref": "SG"
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::ImportValue": "eksctl-capstonecharu-cluster::SecurityGroup"
+        },
+        "ToPort": 65535
+      }
+    },
+    "IngressInterClusterAPI": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "Description": "Allow worker nodes in group EKS-public-workers to communicate with control plane (workloads using HTTPS port, commonly used with extension API servers)",
+        "FromPort": 443,
+        "GroupId": {
+          "Ref": "SG"
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::ImportValue": "eksctl-capstonecharu-cluster::SecurityGroup"
+        },
+        "ToPort": 443
+      }
+    },
+    "IngressInterClusterCP": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "Description": "Allow control plane to receive API requests from worker nodes in group EKS-public-workers",
+        "FromPort": 443,
+        "GroupId": {
+          "Fn::ImportValue": "eksctl-capstonecharu-cluster::SecurityGroup"
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Ref": "SG"
+        },
+        "ToPort": 443
+      }
+    },
+    "NodeGroup": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "DesiredCapacity": "2",
+        "LaunchTemplate": {
+          "LaunchTemplateName": {
+            "Fn::Sub": "${AWS::StackName}"
+          },
+          "Version": {
+            "Fn::GetAtt": [
+              "NodeGroupLaunchTemplate",
+              "LatestVersionNumber"
+            ]
+          }
+        },
+        "MaxSize": "2",
+        "MinSize": "2",
+        "Tags": [
+          {
+            "Key": "Name",
+            "PropagateAtLaunch": "true",
+            "Value": "capstonecharu-EKS-public-workers-Node"
+          },
+          {
+            "Key": "kubernetes.io/cluster/capstonecharu",
+            "PropagateAtLaunch": "true",
+            "Value": "owned"
+          }
+        ],
+        "VPCZoneIdentifier": {
+          "Fn::Split": [
+            ",",
+            {
+              "Fn::ImportValue": "eksctl-capstonecharu-cluster::SubnetsPublic"
+            }
+          ]
+        }
+      },
+      "UpdatePolicy": {
+        "AutoScalingRollingUpdate": {
+          "MaxBatchSize": "1",
+          "MinInstancesInService": "0"
+        }
+      }
+    },
+    "NodeGroupLaunchTemplate": {
+      "Type": "AWS::EC2::LaunchTemplate",
+      "Properties": {
+        "LaunchTemplateData": {
+          "BlockDeviceMappings": [
+            {
+              "DeviceName": "/dev/xvda",
+              "Ebs": {
+                "Encrypted": false,
+                "VolumeSize": 80,
+                "VolumeType": "gp2"
+              }
+            }
+          ],
+          "IamInstanceProfile": {
+            "Arn": {
+              "Fn::GetAtt": [
+                "NodeInstanceProfile",
+                "Arn"
+              ]
+            }
+          },
+          "ImageId": "ami-0cd8562db082e8c1a",
+          "InstanceType": "t2.medium",
+          "MetadataOptions": {
+            "HttpPutResponseHopLimit": 2,
+            "HttpTokens": "optional"
+          },
+          "NetworkInterfaces": [
+            {
+              "DeviceIndex": 0,
+              "Groups": [
+                {
+                  "Fn::ImportValue": "eksctl-capstonecharu-cluster::SharedNodeSecurityGroup"
+                },
+                {
+                  "Ref": "SG"
+                }
+              ]
+            }
+          ],
+          "UserData": "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"
+        },
+        "LaunchTemplateName": {
+          "Fn::Sub": "${AWS::StackName}"
+        }
+      }
+    },
+    "NodeInstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "NodeInstanceRole"
+          }
+        ]
+      }
+    },
+    "NodeInstanceRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  {
+                    "Fn::FindInMap": [
+                      "ServicePrincipalPartitionMap",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      "EC2"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+          },
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+          },
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/AmazonEKS_CNI_Policy"
+          }
+        ],
+        "Path": "/",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${AWS::StackName}/NodeInstanceRole"
+            }
+          }
+        ]
+      }
+    },
+    "SG": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Communication between the control plane and worker nodes in group EKS-public-workers",
+        "Tags": [
+          {
+            "Key": "kubernetes.io/cluster/capstonecharu",
+            "Value": "owned"
+          },
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${AWS::StackName}/SG"
+            }
+          }
+        ],
+        "VpcId": {
+          "Fn::ImportValue": "eksctl-capstonecharu-cluster::VPC"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "FeatureLocalSecurityGroup": {
+      "Value": true
+    },
+    "FeaturePrivateNetworking": {
+      "Value": false
+    },
+    "FeatureSharedSecurityGroup": {
+      "Value": true
+    },
+    "InstanceProfileARN": {
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}::InstanceProfileARN"
+        }
+      },
+      "Value": {
+        "Fn::GetAtt": [
+          "NodeInstanceProfile",
+          "Arn"
+        ]
+      }
+    },
+    "InstanceRoleARN": {
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}::InstanceRoleARN"
+        }
+      },
+      "Value": {
+        "Fn::GetAtt": [
+          "NodeInstanceRole",
+          "Arn"
+        ]
+      }
+    }
+  }
+}
