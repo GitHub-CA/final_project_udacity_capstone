@@ -52,7 +52,7 @@ eksctl delete cluster --region=ap-south-1 --name=capstonecharu
 
 #port 31479
 
-
+http://13.232.114.215:31479/
 
 
 
