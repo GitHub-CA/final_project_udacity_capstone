@@ -1,0 +1,29 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: capstonecharu
+  region: ap-south-1
+
+vpc:
+  id: vpc-0c98cc657b46e482b
+  cidr: "192.168.0.0/16"
+  subnets:
+    public:
+      ap-south-1a:
+        id: subnet-0ac893109392659d5
+      ap-south-1b:
+        id: subnet-0ea0a79041772df0d
+    private:
+      ap-south-1a:
+        id: subnet-0edefa367b5d03de6
+      ap-south-1b:
+        id: subnet-0b7fca19df806166b
+
+nodeGroups:
+  - name: EKS-public-workers
+    instanceType: t2.medium
+    desiredCapacity: 2
+  - name: EKS-private-workers
+    instanceType: t2.medium
+    desiredCapacity: 1
+    privateNetworking: true

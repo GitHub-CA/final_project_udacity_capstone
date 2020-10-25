@@ -1,0 +1,88 @@
+[ℹ]  eksctl version 0.30.0
+[ℹ]  using region ap-south-1
+[!]  only 1 stacks found, for a ready-to-use cluster there should be at least 2
+[ℹ]  stack/eksctl-capstone-cluster = {
+  Capabilities: ["CAPABILITY_IAM"],
+  CreationTime: 2020-10-25 10:58:39.079 +0000 UTC,
+  Description: "EKS cluster (dedicated VPC: true, dedicated IAM: true) [created and managed by eksctl]",
+  DisableRollback: false,
+  DriftInformation: {
+    StackDriftStatus: "NOT_CHECKED"
+  },
+  EnableTerminationProtection: false,
+  Outputs: [
+    {
+      ExportName: "eksctl-capstone-cluster::SubnetsPrivate",
+      OutputKey: "SubnetsPrivate",
+      OutputValue: "subnet-0f36bbd3ba2b9bbf3,subnet-0b2136278f99a48f0,subnet-02d671c5a19df5953"
+    },
+    {
+      ExportName: "eksctl-capstone-cluster::SubnetsPublic",
+      OutputKey: "SubnetsPublic",
+      OutputValue: "subnet-0b35f32fe2c2df845,subnet-0228cfee01b3eccfc,subnet-0248f86f5cfc5b051"
+    },
+    {
+      OutputKey: "FeatureNATMode",
+      OutputValue: "Single"
+    },
+    {
+      ExportName: "eksctl-capstone-cluster::ServiceRoleARN",
+      OutputKey: "ServiceRoleARN",
+      OutputValue: "arn:aws:iam::258643921434:role/eksctl-capstone-cluster-ServiceRole-14VRZZX94GD4D"
+    },
+    {
+      ExportName: "eksctl-capstone-cluster::Endpoint",
+      OutputKey: "Endpoint",
+      OutputValue: "https://C19A1583F55D4D6BA9B23E99052D4726.sk1.ap-south-1.eks.amazonaws.com"
+    },
+    {
+      ExportName: "eksctl-capstone-cluster::SharedNodeSecurityGroup",
+      OutputKey: "SharedNodeSecurityGroup",
+      OutputValue: "sg-0b2592d573df8fb5b"
+    },
+    {
+      ExportName: "eksctl-capstone-cluster::VPC",
+      OutputKey: "VPC",
+      OutputValue: "vpc-0486aa583042f9f29"
+    },
+    {
+      ExportName: "eksctl-capstone-cluster::ClusterSecurityGroupId",
+      OutputKey: "ClusterSecurityGroupId",
+      OutputValue: "sg-09cbf7e2a5ed89e9d"
+    },
+    {
+      OutputKey: "ClusterStackName",
+      OutputValue: "eksctl-capstone-cluster"
+    },
+    {
+      OutputKey: "CertificateAuthorityData",
+      OutputValue: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJd01UQXlOVEV4TURjME1sb1hEVE13TVRBeU16RXhNRGMwTWxvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBT05HCnZaU1oxS3pBT2tHdml1Z3Nqd3lLcnBkZGtXWHpCSzA3T3JpcjZUd1BDRi9ORHFTZnpTdzE0VHRKekExU2VwbDQKNkdja0s0T21RN1IvYll1ZVZzaDRualBWdUdoYS9DcGNPazdrSEhxRlQ1SlYxcDluWVFzSVY0bUw0b05NYzcrbApOWW1JSmZkeGlMMlB5UkNMRU04MURaQlp3UEc3NytuT0dyV0RPUy9LVmZkK09GV1ZVOEdYbWc2VVdpL0ovR2JNClJ3ZG1FT2xuSndaRTdYcWxMc3RKT1R5c0RxWVNRbkI2OEU1TjJnY09tLzdwR2pZd2dRT0RlWnFSTGY4RVhKTFkKWUptUS91bFQrZU45UFp3RkFEUVJZRmFxamZaMVRjZ2o0K1JVUFllUUdhcEQyUzROZUs1Wm1EQXRqYk8zM0lwTgpyaEtWZUdWWVZrR3kvMjZDT1FzQ0F3RUFBYU1qTUNFd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFDU0FwSyt3VHNpWlVUOGdWb1lNK3ZSUDJnMncKMnA1cjUyRVg4cm01NG1OaUY4Y0hrWmVtRVdBMXdUT2VsNFh5TnJUdDh4MFZ3d2NRRDVoYzJWZFgydTVweTB5MgppWFVBQWZpNU5keEhPVi8rRElCS29XUGdFRjFMczV5bFE5c2xiTCtKblc5bHRxSTV4TEdGa3pVNjZHUDlGRk9DCkw0ZkxpZWdSNmpyeUhKWklBVVVaTWRWT0xmUnl5RUVoNWRkYk1kU3lrK3RkWmFCbGJyU2J0c2dxMWF5bmxDOTgKS3RuM3FiQjVWZ1kvS2xFQkVobU9Ub2hFTFA4UlhMa1J4TEc2bjRGdytKdmNUR0Z2LzhjK0R0eGVMNWF4YmNhYQpvRWxJeUZYcmpKc00yb1dYNGNOZGEveFJvYW5oL0N5czJkVDUxcGdYOVdCVmVGSDRUVitHRUVvbXE3bz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo="
+    },
+    {
+      ExportName: "eksctl-capstone-cluster::SecurityGroup",
+      OutputKey: "SecurityGroup",
+      OutputValue: "sg-03282f221053214db"
+    },
+    {
+      ExportName: "eksctl-capstone-cluster::ARN",
+      OutputKey: "ARN",
+      OutputValue: "arn:aws:eks:ap-south-1:258643921434:cluster/capstone"
+    }
+  ],
+  RollbackConfiguration: {
+
+  },
+  StackId: "arn:aws:cloudformation:ap-south-1:258643921434:stack/eksctl-capstone-cluster/0971d690-16b1-11eb-a872-06bd44a9068e",
+  StackName: "eksctl-capstone-cluster",
+  StackStatus: "CREATE_COMPLETE",
+  Tags: [{
+      Key: "alpha.eksctl.io/cluster-name",
+      Value: "capstone"
+    },{
+      Key: "eksctl.cluster.k8s.io/v1alpha1/cluster-name",
+      Value: "capstone"
+    },{
+      Key: "alpha.eksctl.io/eksctl-version",
+      Value: "0.30.0"
+    }]
+}
